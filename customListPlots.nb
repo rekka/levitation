@@ -1,0 +1,627 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     24896,        618]
+NotebookOptionsPosition[     23671,        571]
+NotebookOutlinePosition[     24046,        587]
+CellTagsIndexPosition[     24003,        584]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Custom ListPlots", "Title",
+ CellChangeTimes->{{3.44461207946875*^9, 3.4446120825*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Package", "Section",
+ CellChangeTimes->{{3.444613413234375*^9, 3.444613414625*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Prolog", "Subsection",
+ CellChangeTimes->{{3.444613459984375*^9, 3.44461346075*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"BeginPackage", "[", "\"\<customListPlots`\>\"", "]"}], 
+  ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.44461220234375*^9, 3.444612218265625*^9}, 
+   3.44462210877942*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definitions", "Subsection",
+ InitializationCell->True,
+ CellChangeTimes->{{3.4446120949375*^9, 3.444612096671875*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "scrollableListPlot", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"topResolution", "\[Rule]", "500"}], ",", 
+     RowBox[{"resolution", "\[Rule]", "800"}], ",", 
+     RowBox[{"topPlot", "\[Rule]", 
+      RowBox[{"{", "}"}]}], ",", 
+     RowBox[{"plot", "\[Rule]", 
+      RowBox[{"{", "}"}]}]}], "}"}]}], ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444613574625*^9, 3.44461357759375*^9}, {
+   3.444616799421875*^9, 3.44461683396875*^9}, {3.444616876484375*^9, 
+   3.44461687996875*^9}, {3.444617921203125*^9, 3.44461792734375*^9}, {
+   3.444618212875*^9, 3.444618226109375*^9}, {3.4446202740273705`*^9, 
+   3.4446203811752124`*^9}, {3.4446205660700808`*^9, 
+   3.4446205735558925`*^9}, {3.444620644006916*^9, 3.4446206514771004`*^9}, {
+   3.4446208722226005`*^9, 3.4446208792083163`*^9}, {3.4446210245799723`*^9, 
+   3.4446210544294524`*^9}, {3.44462159863531*^9, 3.444621599823*^9}, 
+   3.444621730687685*^9, {3.4446219828217697`*^9, 3.444621999402548*^9}}],
+
+Cell[TextData[{
+ "Creates a scrollable list module. I'm not using DynamicModule in this case \
+since it is too buggy and slow for big data lists. In particular, ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"dataSpec", "=", 
+    RowBox[{"Sequence", "[", "]"}]}], TraditionalForm]]],
+ " couses a lot of trouble."
+}], "Text",
+ CellChangeTimes->{{3.4446220086852827`*^9, 3.44462206514744*^9}, {
+  3.4450608428125*^9, 3.445060847828125*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"scrollableListPlot", "[", 
+    RowBox[{"data_", ",", 
+     RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], ":=", 
+   "\[IndentingNewLine]", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+      "len", ",", "\[IndentingNewLine]", "topPlotData", ",", " ", 
+       "\[IndentingNewLine]", "plotData", ",", "\[IndentingNewLine]", "low", 
+       ",", "\[IndentingNewLine]", "high", ",", "\[IndentingNewLine]", 
+       "topPlotLow", ",", "\[IndentingNewLine]", "topPlotHigh", ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"epilog", "=", 
+        RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", "min", ",", 
+       "\[IndentingNewLine]", "max", ",", "\[IndentingNewLine]", "plotLow", 
+       ",", "\[IndentingNewLine]", "plotHigh", ",", "\[IndentingNewLine]", 
+       "dataSpec"}], "\[IndentingNewLine]", "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"If", "[", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"ArrayDepth", "[", "data", "]"}], "\[Equal]", "1"}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"len", " ", "=", 
+           RowBox[{
+            RowBox[{"Dimensions", "[", "data", "]"}], "[", 
+            RowBox[{"[", "1", "]"}], "]"}]}], ")"}], ";", 
+         RowBox[{"dataSpec", "=", 
+          RowBox[{"Sequence", "[", "]"}]}]}], ",", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"len", " ", "=", 
+           RowBox[{
+            RowBox[{"Dimensions", "[", "data", "]"}], "[", 
+            RowBox[{"[", "2", "]"}], "]"}]}], ")"}], ";", 
+         RowBox[{"dataSpec", "=", "All"}]}]}], "\[IndentingNewLine]", "]"}], 
+      ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"topPlotData", " ", "=", "\[IndentingNewLine]", " ", 
+       RowBox[{"data", "[", 
+        RowBox[{"[", 
+         RowBox[{"dataSpec", ",", 
+          RowBox[{";;", ";;", 
+           RowBox[{"Floor", "[", 
+            RowBox[{"len", "/", 
+             RowBox[{"OptionValue", "[", "topResolution", "]"}]}], "]"}]}]}], 
+         "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"low", " ", "=", " ", "1"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"high", " ", "=", " ", 
+       RowBox[{"Min", "[", 
+        RowBox[{
+         RowBox[{"OptionValue", "[", "resolution", "]"}], ",", "len"}], 
+        "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"topPlotLow", "=", "0"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"topPlotHigh", "=", 
+       RowBox[{"len", "-", "1"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"min", " ", "=", " ", 
+       RowBox[{"Min", "[", "data", "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"max", "=", " ", 
+       RowBox[{"Max", "[", "data", "]"}]}], ";", "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", 
+      RowBox[{"plotLow", "=", 
+       RowBox[{"low", "-", "1"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"plotHigh", "=", 
+       RowBox[{"high", "-", "1"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"plotData", " ", "=", "\[IndentingNewLine]", 
+       RowBox[{"data", "[", 
+        RowBox[{"[", 
+         RowBox[{"dataSpec", ",", 
+          RowBox[{"low", ";;", "high"}]}], "]"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"Column", "[", 
+       RowBox[{"{", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+         "EventHandler", "[", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"ListPlot", "[", 
+            RowBox[{"topPlotData", ",", "\[IndentingNewLine]", 
+             RowBox[{"Epilog", "\[Rule]", 
+              RowBox[{"Dynamic", "[", "epilog", "]"}]}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"DataRange", "\[Rule]", 
+              RowBox[{"{", 
+               RowBox[{"topPlotLow", ",", "topPlotHigh"}], "}"}]}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"OptionValue", "[", "topPlot", "]"}]}], "]"}], ",", 
+           "\[IndentingNewLine]", "\[IndentingNewLine]", 
+           RowBox[{"With", "[", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"action", ":=", "\[IndentingNewLine]", 
+               RowBox[{"Block", "[", 
+                RowBox[{
+                 RowBox[{"{", 
+                  RowBox[{"pos", ",", "click"}], "}"}], ",", 
+                 "\[IndentingNewLine]", 
+                 RowBox[{
+                  RowBox[{"pos", "=", 
+                   RowBox[{"MousePosition", "[", "\"\<Graphics\>\"", "]"}]}], 
+                  ";", "\[IndentingNewLine]", 
+                  RowBox[{"click", " ", "=", " ", 
+                   RowBox[{"Floor", "[", 
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"pos", "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], "-", "topPlotLow"}], 
+                    ")"}], "*", 
+                    RowBox[{"len", "/", 
+                    RowBox[{"(", 
+                    RowBox[{"topPlotHigh", "-", "topPlotLow"}], ")"}]}]}], 
+                    "]"}]}], ";", "\[IndentingNewLine]", 
+                  RowBox[{"low", " ", "=", " ", 
+                   RowBox[{"Max", "[", 
+                    RowBox[{"1", ",", 
+                    RowBox[{"Floor", "[", 
+                    RowBox[{"click", " ", "-", " ", 
+                    RowBox[{
+                    RowBox[{"OptionValue", "[", "resolution", "]"}], "/", 
+                    "2"}]}], "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+                  RowBox[{"high", " ", "=", " ", 
+                   RowBox[{"Min", "[", 
+                    RowBox[{"len", ",", 
+                    RowBox[{"low", " ", "+", 
+                    RowBox[{"OptionValue", "[", "resolution", "]"}], "-", 
+                    "1"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+                  RowBox[{"low", "=", 
+                   RowBox[{"Max", "[", 
+                    RowBox[{"1", ",", 
+                    RowBox[{"Min", "[", 
+                    RowBox[{"low", ",", 
+                    RowBox[{"high", "-", 
+                    RowBox[{"OptionValue", "[", "resolution", "]"}], "+", 
+                    "1"}]}], "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+                  "\[IndentingNewLine]", 
+                  RowBox[{"epilog", "=", 
+                   RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"Opacity", "[", "0.3", "]"}], ",", "Blue", ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"Block", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"x", ",", "y"}], "}"}], ",", 
+                    RowBox[{
+                    RowBox[{"x", "=", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"low", "-", "1"}], ")"}], "*", 
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"topPlotHigh", "-", "topPlotLow"}], ")"}], "/", 
+                    RowBox[{"(", 
+                    RowBox[{"len", "-", "1"}], ")"}]}]}], " ", "+", 
+                    "topPlotLow"}]}], ";", 
+                    RowBox[{"y", "=", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"high", "-", "1"}], ")"}], "*", 
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"topPlotHigh", "-", "topPlotLow"}], ")"}], "/", 
+                    RowBox[{"(", 
+                    RowBox[{"len", "-", "1"}], ")"}]}]}], "+", 
+                    "topPlotLow"}]}], ";", 
+                    RowBox[{"Polygon", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"x", ",", "min"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"x", ",", "max"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"y", ",", "max"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"y", ",", "min"}], "}"}]}], "}"}], "]"}]}]}], 
+                    "]"}]}], "}"}]}], ";", "\[IndentingNewLine]", 
+                  RowBox[{"plotLow", "=", 
+                   RowBox[{"low", "-", "1"}]}], ";", "\[IndentingNewLine]", 
+                  RowBox[{"plotHigh", "=", 
+                   RowBox[{"high", "-", "1"}]}], ";", "\[IndentingNewLine]", 
+                  RowBox[{"plotData", "=", 
+                   RowBox[{"data", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"dataSpec", ",", 
+                    RowBox[{"low", ";;", "high"}]}], "]"}], "]"}]}]}]}], 
+                "\[IndentingNewLine]", "]"}]}], "}"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"{", "\[IndentingNewLine]", 
+              RowBox[{
+               RowBox[{"\"\<MouseClicked\>\"", "\[RuleDelayed]", "action"}], 
+               ",", "\[IndentingNewLine]", 
+               RowBox[{"\"\<MouseDragged\>\"", "\[RuleDelayed]", "action"}]}],
+               "\[IndentingNewLine]", "}"}]}], "\[IndentingNewLine]", "]"}]}],
+           "\[IndentingNewLine]", "\[IndentingNewLine]", "]"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Dynamic", "[", 
+          RowBox[{"rangePane", "[", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"ListPlot", "[", 
+             RowBox[{"plotData", ",", 
+              RowBox[{"DataRange", "\[Rule]", 
+               RowBox[{"{", 
+                RowBox[{"plotLow", ",", "plotHigh"}], "}"}]}], ",", 
+              RowBox[{"OptionValue", "[", "plot", "]"}]}], "]"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{"plotLow", ",", "plotHigh"}], "}"}], ",", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"Min", "[", "plotData", "]"}], ",", 
+                RowBox[{"Max", "[", "plotData", "]"}]}], "}"}]}], "}"}]}], 
+           "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", "]"}]}], 
+        "\[IndentingNewLine]", "}"}], "]"}]}]}], "\[IndentingNewLine]", 
+    "]"}]}], "\[IndentingNewLine]"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444613574625*^9, 3.44461357759375*^9}, {
+   3.444616799421875*^9, 3.44461683396875*^9}, {3.444616876484375*^9, 
+   3.44461687996875*^9}, {3.444617921203125*^9, 3.44461792734375*^9}, {
+   3.444618212875*^9, 3.444618226109375*^9}, {3.4446202740273705`*^9, 
+   3.4446203811752124`*^9}, {3.4446205660700808`*^9, 
+   3.4446205735558925`*^9}, {3.444620644006916*^9, 3.4446206514771004`*^9}, {
+   3.4446208722226005`*^9, 3.4446208792083163`*^9}, {3.4446210245799723`*^9, 
+   3.4446210544294524`*^9}, {3.44462159863531*^9, 3.444621599823*^9}, 
+   3.444621730687685*^9, 3.4446219828217697`*^9, {3.44506104178125*^9, 
+   3.445061161609375*^9}, 3.44506123975*^9}],
+
+Cell["\<\
+rangePane is a pane where the user can position delimiters and the distance \
+between the neighbors is displayed\
+\>", "Text",
+ CellChangeTimes->{{3.445060993546875*^9, 3.445061027515625*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "rangePane", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{"maxPoints", "\[Rule]", "3"}], "}"}]}], ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.445061369140625*^9, 3.44506138834375*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangePane", "[", 
+   RowBox[{"graphics_Graphics", ",", "range_", ",", 
+    RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"DynamicModule", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"pts", "=", 
+      RowBox[{"{", "}"}]}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"With", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"maxpts", "=", 
+         RowBox[{"OptionValue", "[", "maxPoints", "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"mousex", ":=", 
+         RowBox[{"Floor", "[", 
+          RowBox[{
+           RowBox[{"MousePosition", "[", "\"\<Graphics\>\"", "]"}], "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"mousexclosest", ":=", 
+         RowBox[{
+          RowBox[{"Ordering", "[", 
+           RowBox[{
+            RowBox[{"Abs", "[", 
+             RowBox[{"pts", "-", 
+              RowBox[{"Floor", "[", 
+               RowBox[{
+                RowBox[{"MousePosition", "[", "\"\<Graphics\>\"", "]"}], "[", 
+                RowBox[{"[", "1", "]"}], "]"}], "]"}]}], "]"}], ",", "1"}], 
+           "]"}], "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"rangeMin", "=", 
+         RowBox[{"range", "[", 
+          RowBox[{"[", 
+           RowBox[{"1", ",", "1"}], "]"}], "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"rangeMax", "=", 
+         RowBox[{"range", "[", 
+          RowBox[{"[", 
+           RowBox[{"1", ",", "2"}], "]"}], "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"plotMin", "=", 
+         RowBox[{"range", "[", 
+          RowBox[{"[", 
+           RowBox[{"2", ",", "1"}], "]"}], "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"plotMax", "=", 
+         RowBox[{"range", "[", 
+          RowBox[{"[", 
+           RowBox[{"2", ",", "2"}], "]"}], "]"}]}]}], "\[IndentingNewLine]", 
+       "}"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"EventHandler", "[", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Show", "[", 
+         RowBox[{"graphics", ",", "\[IndentingNewLine]", 
+          RowBox[{"Epilog", "\[Rule]", 
+           RowBox[{"Dynamic", "[", 
+            RowBox[{"{", "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{
+               RowBox[{
+                RowBox[{"Line", "[", 
+                 RowBox[{"{", 
+                  RowBox[{
+                   RowBox[{"{", 
+                    RowBox[{"#", ",", "plotMin"}], "}"}], ",", 
+                   RowBox[{"{", 
+                    RowBox[{"#", ",", "plotMax"}], "}"}]}], "}"}], "]"}], 
+                "&"}], "/@", "pts"}], ",", "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Length", "[", "pts", "]"}], "\[GreaterEqual]", 
+                 "2"}], ",", 
+                RowBox[{"MapThread", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"Text", "[", 
+                    RowBox[{"#1", ",", 
+                    RowBox[{"{", 
+                    RowBox[{"#2", ",", 
+                    RowBox[{"plotMin", "+", 
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"plotMax", "-", "plotMin"}], ")"}], "*", 
+                    "0.9"}]}]}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", "0"}], "}"}]}], "]"}], "&"}], ",", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"Differences", "[", "#", "]"}], ",", 
+                    RowBox[{"MovingAverage", "[", 
+                    RowBox[{"#", ",", "2"}], "]"}]}], "}"}], "&"}], "[", 
+                   RowBox[{"Sort", "[", "pts", "]"}], "]"}]}], 
+                 "\[IndentingNewLine]", "]"}], ",", "\[IndentingNewLine]", 
+                RowBox[{"{", "}"}]}], "\[IndentingNewLine]", "]"}]}], 
+             "\[IndentingNewLine]", "}"}], "]"}]}]}], "\[IndentingNewLine]", 
+         "]"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"\"\<MouseDown\>\"", "\[RuleDelayed]", 
+           RowBox[{"(", "\[IndentingNewLine]", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"CurrentValue", "[", "\"\<ControlKey\>\"", "]"}], ",", 
+              "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Length", "[", "pts", "]"}], ">", "0"}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{"pts", "=", 
+                 RowBox[{"Drop", "[", 
+                  RowBox[{"pts", ",", 
+                   RowBox[{"{", "mousexclosest", "}"}]}], "]"}]}]}], 
+               "\[IndentingNewLine]", "]"}], ",", "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{"CurrentValue", "[", "\"\<AltKey\>\"", "]"}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"Length", "[", "pts", "]"}], ">", "1"}], ",", 
+                  "\[IndentingNewLine]", 
+                  RowBox[{"Block", "[", 
+                   RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"c", "=", "mousexclosest"}], "}"}], ",", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"-", "1"}], "]"}], "]"}], ",", 
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", "c", "]"}], "]"}]}], "}"}], "=", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", "c", "]"}], "]"}], ",", 
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"-", "1"}], "]"}], "]"}]}], "}"}]}], ")"}]}], 
+                   "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", 
+                 "]"}], ",", "\[IndentingNewLine]", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"Length", "[", "pts", "]"}], "<", "maxpts"}], ",", 
+                  "\[IndentingNewLine]", 
+                  RowBox[{"AppendTo", "[", 
+                   RowBox[{"pts", ",", "mousex"}], "]"}], ",", 
+                  "\[IndentingNewLine]", 
+                  RowBox[{"Block", "[", 
+                   RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"c", "=", "mousexclosest"}], "}"}], ",", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"-", "1"}], "]"}], "]"}], ",", 
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", "c", "]"}], "]"}]}], "}"}], "=", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", "c", "]"}], "]"}], ",", 
+                    RowBox[{"pts", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"-", "1"}], "]"}], "]"}]}], "}"}]}], ")"}]}], 
+                   "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", 
+                 "]"}]}], "\[IndentingNewLine]", "]"}]}], 
+             "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", ")"}]}], 
+          ",", "\[IndentingNewLine]", 
+          RowBox[{"\"\<MouseDragged\>\"", "\[RuleDelayed]", 
+           RowBox[{"(", "\[IndentingNewLine]", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"!", 
+               RowBox[{"CurrentValue", "[", "\"\<ControlKey\>\"", "]"}]}], 
+              ",", "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Length", "[", "pts", "]"}], ">", "0"}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{
+                 RowBox[{"pts", "[", 
+                  RowBox[{"[", 
+                   RowBox[{"-", "1"}], "]"}], "]"}], "=", "mousex"}]}], 
+               "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", "]"}], 
+            "\[IndentingNewLine]", ")"}]}]}], "\[IndentingNewLine]", "}"}]}], 
+       "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", "]"}]}], 
+   "]"}]}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.445061369140625*^9, 3.44506138834375*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Epilog", "Subsection",
+ CellChangeTimes->{{3.444613464796875*^9, 3.4446134655625*^9}}],
+
+Cell[BoxData[
+ RowBox[{"EndPackage", "[", "]"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612226203125*^9, 3.444612228296875*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Experiments", "Section",
+ CellChangeTimes->{{3.4446121044375*^9, 3.44461210615625*^9}}],
+
+Cell[BoxData[
+ RowBox[{"scrollableListPlot", "[", 
+  RowBox[{"Range", "[", "100000", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.445061175234375*^9, 3.44506120275*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{716, 686},
+WindowMargins->{{Automatic, 2}, {Automatic, 0}},
+FrontEndVersion->"8.0 for Microsoft Windows (64-bit) (December 7, 2010)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[567, 22, 93, 1, 83, "Title"],
+Cell[CellGroupData[{
+Cell[685, 27, 89, 1, 71, "Section"],
+Cell[CellGroupData[{
+Cell[799, 32, 90, 1, 36, "Subsection"],
+Cell[892, 35, 226, 6, 31, "Input",
+ InitializationCell->True]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1155, 46, 124, 2, 36, "Subsection",
+ InitializationCell->True],
+Cell[1282, 50, 1053, 21, 52, "Input",
+ InitializationCell->True],
+Cell[2338, 73, 431, 10, 47, "Text"],
+Cell[2772, 85, 10964, 235, 1512, "Input",
+ InitializationCell->True],
+Cell[13739, 322, 202, 4, 29, "Text"],
+Cell[13944, 328, 265, 7, 31, "Input",
+ InitializationCell->True],
+Cell[14212, 337, 8833, 207, 1092, "Input",
+ InitializationCell->True]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23082, 549, 92, 1, 36, "Subsection"],
+Cell[23177, 552, 151, 3, 31, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23377, 561, 93, 1, 71, "Section"],
+Cell[23473, 564, 170, 3, 31, "Input"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

@@ -1,0 +1,810 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     34205,        801]
+NotebookOptionsPosition[     33239,        761]
+NotebookOutlinePosition[     33636,        778]
+CellTagsIndexPosition[     33593,        775]
+WindowFrame->Normal
+ContainsDynamic->True *)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Arduino Front End", "Title",
+ CellChangeTimes->{{3.444614638421875*^9, 3.444614641921875*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["File", "Section",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444614630109375*^9, 3.444614631515625*^9}, {
+  3.444614800375*^9, 3.44461480071875*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Initialization", "Subsection",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444614585609375*^9, 3.4446145881875*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"AppendTo", "[", 
+   RowBox[{"$Path", ",", 
+    RowBox[{"NotebookDirectory", "[", "]"}]}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Needs", "[", "\"\<arduino`\>\"", "]"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444613913609375*^9, 3.4446139661875*^9}, 
+   3.4446140338125*^9, {3.444614571953125*^9, 3.44461457703125*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definitions", "Subsection",
+ InitializationCell->True,
+ CellChangeTimes->{{3.44461459184375*^9, 3.44461459328125*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"arduinoControls", "[", 
+   RowBox[{"signals_", ",", "processing_", ",", "plotOptions_"}], "]"}], ":=",
+   
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"resultPlot", "=", "Null"}], "}"}], ",", "\[IndentingNewLine]", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Column", "[", 
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"Row", "[", 
+        RowBox[{"{", 
+         RowBox[{"\"\<Save data \>\"", ",", " ", 
+          RowBox[{"Checkbox", "[", 
+           RowBox[{"Dynamic", "[", "arduinoSaveData", "]"}], "]"}]}], "}"}], 
+        "]"}], ",", "\n", "\t", 
+       RowBox[{"Row", "[", 
+        RowBox[{"{", "\n", "\t", 
+         RowBox[{
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<open\>\"", ",", 
+            RowBox[{"arduinoOpen", "[", "]"}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}], ",", 
+            RowBox[{"Enabled", "->", 
+             RowBox[{"Dynamic", "[", 
+              RowBox[{"!", "serialPortOpen"}], "]"}]}]}], "]"}], ",", "\n", 
+          "\t", 
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<close\>\"", ",", 
+            RowBox[{"arduinoClose", "[", "]"}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}], ",", 
+            RowBox[{"Enabled", "->", 
+             RowBox[{"Dynamic", "[", "serialPortOpen", "]"}]}]}], "]"}], ",", 
+          "\n", "\t", 
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<start\>\"", ",", 
+            RowBox[{
+             RowBox[{"resetReceivedData", "[", "]"}], ";", 
+             RowBox[{"arduinoStart", "[", "]"}]}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}], ",", 
+            RowBox[{"Enabled", "->", 
+             RowBox[{"Dynamic", "[", 
+              RowBox[{
+               RowBox[{"!", "arduinoAction"}], " ", "&&", " ", 
+               "serialPortOpen"}], "]"}]}]}], "]"}], ",", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", "\n", "\t", 
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<stop\>\"", ",", 
+            RowBox[{
+             RowBox[{"arduinoStop", "[", "]"}], ";", 
+             RowBox[{"Pause", "[", "0.2", "]"}], ";", 
+             RowBox[{"readReceivedData", "[", "]"}], ";", "\n", "\t", 
+             RowBox[{"resultPlot", "=", 
+              RowBox[{"If", "[", 
+               RowBox[{"arduinoSaveData", ",", 
+                RowBox[{"Module", "[", 
+                 RowBox[{
+                  RowBox[{"{", "data", "}"}], ",", "\[IndentingNewLine]", 
+                  RowBox[{
+                   RowBox[{"data", "=", 
+                    RowBox[{"processing", "[", 
+                    RowBox[{"Transpose", "[", 
+                    RowBox[{"Partition", "[", 
+                    RowBox[{
+                    RowBox[{"Drop", "[", 
+                    RowBox[{
+                    RowBox[{"receivedData", "[", "]"}], ",", "32"}], "]"}], 
+                    ",", "signals"}], "]"}], "]"}], "]"}]}], ";", "\n", 
+                   "\t\t", 
+                   RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"receivedData", "[", "]"}], "[", 
+                    RowBox[{"[", 
+                    RowBox[{"1", ";;", "32"}], "]"}], "]"}], "\[NotEqual]", 
+                    RowBox[{
+                    RowBox[{"Range", "[", "32", "]"}], "-", "1"}]}], ",", 
+                    "\[IndentingNewLine]", "\"\<Invalid header\>\"", ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{
+                    "scrollableListPlot", "[", "\n", "\t", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"data", ",", "\n", "\t", "\[IndentingNewLine]", 
+                    RowBox[{"topPlot", "->", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"ImageSize", "->", "Full"}], ",", 
+                    RowBox[{"AspectRatio", "->", 
+                    RowBox[{"1", "/", "6"}]}], ",", 
+                    RowBox[{"PlotRange", "\[Rule]", "All"}]}], "}"}]}], ",", 
+                    "\t", "\[IndentingNewLine]", 
+                    RowBox[{"plot", "->", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"ImageSize", "->", "Full"}], ",", 
+                    RowBox[{"AspectRatio", "->", 
+                    RowBox[{"1", "/", "3"}]}], ",", 
+                    RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+                    RowBox[{"PlotRange", "\[Rule]", "All"}], ",", 
+                    "plotOptions"}], "}"}]}]}], "\[IndentingNewLine]", 
+                    "]"}]}], "\[IndentingNewLine]", "]"}]}]}], 
+                 "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", 
+               "]"}]}]}], ",", "\[IndentingNewLine]", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}], ",", 
+            RowBox[{"Enabled", "->", 
+             RowBox[{"Dynamic", "[", "arduinoAction", "]"}]}]}], "]"}], ",", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]",
+           
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<reset data\>\"", ",", 
+            RowBox[{"resetReceivedData", "[", "]"}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}]}], 
+         "\[IndentingNewLine]", "}"}], "]"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"Dynamic", "[", 
+        RowBox[{"Floor", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"dataIndex", "-", "1"}], ")"}], "/", "signals"}], "]"}], 
+        "]"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", "\n", "\t", 
+       
+       RowBox[{"Grid", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"Transpose", "[", "\[IndentingNewLine]", 
+          RowBox[{"Partition", "[", 
+           RowBox[{
+            RowBox[{"Table", "[", "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"With", "[", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"i", "=", "i"}], "}"}], ",", "\[IndentingNewLine]", 
+                RowBox[{"Row", "[", 
+                 RowBox[{"{", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    "\"\<filterInc\>\"", ",", " ", "\"\<res\>\"", ",", " ", 
+                    "\"\<filterDec\>\"", ",", " ", "\"\<filterDecLevel\>\"", 
+                    ",", "\[IndentingNewLine]", " ", "\"\<lowestMag\>\"", ",",
+                     " ", "\"\<powerDecay\>\"", ",", "\"\<res\>\"", ",", 
+                    "\"\<res\>\"", ",", "\[IndentingNewLine]", "\"\<res\>\"", 
+                    ",", " ", "\"\<res\>\"", ",", " ", "\"\<res\>\"", ",", 
+                    " ", "\"\<res\>\"", ",", "\[IndentingNewLine]", 
+                    "\"\<res\>\"", ",", "\"\<res\>\"", ",", "\"\<res\>\"", 
+                    ",", "\[IndentingNewLine]", " ", "\"\<counter\>\""}], 
+                    "}"}], "[", 
+                    RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+                   RowBox[{"InputField", "[", 
+                    RowBox[{
+                    RowBox[{"Dynamic", "[", 
+                    RowBox[{"actionParams", "[", 
+                    RowBox[{"[", "i", "]"}], "]"}], "]"}], ",", "Number", ",",
+                     
+                    RowBox[{"FieldSize", "\[Rule]", "Tiny"}]}], "]"}]}], 
+                  "}"}], "]"}]}], "\[IndentingNewLine]", "]"}], ",", 
+              "\[IndentingNewLine]", 
+              RowBox[{"{", 
+               RowBox[{"i", ",", "numberOfActionParams"}], " ", "}"}]}], 
+             "\[IndentingNewLine]", "]"}], ",", "\[IndentingNewLine]", "8"}], 
+           "]"}], "\[IndentingNewLine]", "]"}], ",", "\[IndentingNewLine]", 
+         RowBox[{"Alignment", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{"Right", ",", "Baseline"}], "}"}]}]}], "]"}], ",", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"Row", "[", 
+        RowBox[{"{", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<lowestMag ++\>\"", ",", 
+            RowBox[{
+             RowBox[{"sendBytes", "[", 
+              RowBox[{"{", "1", "}"}], "]"}], ";", 
+             RowBox[{
+              RowBox[{"actionParams", "[", 
+               RowBox[{"[", "5", "]"}], "]"}], "++"}]}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<lowestMag --\>\"", ",", 
+            RowBox[{
+             RowBox[{"sendBytes", "[", 
+              RowBox[{"{", "2", "}"}], "]"}], ";", 
+             RowBox[{
+              RowBox[{"actionParams", "[", 
+               RowBox[{"[", "5", "]"}], "]"}], "--"}]}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<powerDecay ++\>\"", ",", 
+            RowBox[{
+             RowBox[{"sendBytes", "[", 
+              RowBox[{"{", "3", "}"}], "]"}], ";", 
+             RowBox[{
+              RowBox[{"actionParams", "[", 
+               RowBox[{"[", "6", "]"}], "]"}], "++"}]}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"Button", "[", 
+           RowBox[{"\"\<powerDecay --\>\"", ",", 
+            RowBox[{
+             RowBox[{"sendBytes", "[", 
+              RowBox[{"{", "4", "}"}], "]"}], ";", 
+             RowBox[{
+              RowBox[{"actionParams", "[", 
+               RowBox[{"[", "6", "]"}], "]"}], "--"}]}], ",", 
+            RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}]}], 
+         "\[IndentingNewLine]", "}"}], "]"}], ",", "\n", "\n", "\t", 
+       RowBox[{"Dynamic", "[", "resultPlot", "]"}]}], "\n", 
+      "\[IndentingNewLine]", "\n", "\t", "}"}], "]"}]}], 
+   "\[IndentingNewLine]", "]"}]}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444614676875*^9, 3.444614682953125*^9}, {
+   3.44461484396875*^9, 3.44461485478125*^9}, {3.444618311109375*^9, 
+   3.44461831209375*^9}, {3.444618391421875*^9, 3.444618392015625*^9}, {
+   3.44461871909375*^9, 3.444618728015625*^9}, 3.4446189175625*^9, {
+   3.444619009046875*^9, 3.444619010296875*^9}, {3.444619189265625*^9, 
+   3.444619194953125*^9}, {3.444619488841482*^9, 3.4446194918421926`*^9}, {
+   3.4446195867396593`*^9, 3.4446196380174236`*^9}, {3.4446199966023164`*^9, 
+   3.4446199999781156`*^9}, {3.4446204025230603`*^9, 
+   3.4446204054142404`*^9}, {3.4446210616652164`*^9, 
+   3.4446210624622445`*^9}, {3.4446216442051*^9, 3.444621644923965*^9}, {
+   3.444621861442978*^9, 3.4446219053562527`*^9}, {3.4446221548961725`*^9, 
+   3.4446221780248723`*^9}, {3.4446223411134624`*^9, 
+   3.4446223430669003`*^9}, {3.444623522996908*^9, 3.4446235542813616`*^9}, {
+   3.4446241227301893`*^9, 3.444624154358428*^9}, {3.444624210223523*^9, 
+   3.444624211270505*^9}, {3.4446261264004545`*^9, 3.4446262130940576`*^9}, {
+   3.4446264707840576`*^9, 3.4446264723310213`*^9}, {3.4446265738993716`*^9, 
+   3.444626591837905*^9}, {3.4446277939032974`*^9, 3.444627796387784*^9}, {
+   3.4446280443363914`*^9, 3.4446280471958942`*^9}, {3.4446312106180706`*^9, 
+   3.444631215446319*^9}, {3.44469666753125*^9, 3.44469671703125*^9}, {
+   3.444700825265625*^9, 3.444700840890625*^9}, {3.4447015958125*^9, 
+   3.444701831375*^9}, {3.444701904796875*^9, 3.444701942390625*^9}, {
+   3.4447019926875*^9, 3.444702002296875*^9}, {3.444702067359375*^9, 
+   3.444702079046875*^9}, {3.444702214046875*^9, 3.4447022415625*^9}, {
+   3.4447022798125*^9, 3.44470234215625*^9}, {3.4447024409375*^9, 
+   3.44470244603125*^9}, {3.444702521*^9, 3.444702664375*^9}, {
+   3.44470271465625*^9, 3.4447027160625*^9}, {3.444702886515625*^9, 
+   3.444702887921875*^9}, 3.4448018792815046`*^9, {3.445321041046875*^9, 
+   3.445321140140625*^9}, {3.445326722421875*^9, 3.445326725921875*^9}, {
+   3.4453277811875*^9, 3.445327823390625*^9}, {3.445330970703125*^9, 
+   3.445331098265625*^9}, {3.445331192484375*^9, 3.445331215890625*^9}, {
+   3.445331316328125*^9, 3.445331324046875*^9}, {3.445390748703125*^9, 
+   3.445390777046875*^9}, {3.445390834140625*^9, 3.445390839515625*^9}, {
+   3.445391299859375*^9, 3.445391302078125*^9}, {3.445448501765625*^9, 
+   3.4454486083125*^9}, {3.44544871209375*^9, 3.445448714578125*^9}, {
+   3.445448765640625*^9, 3.445448828359375*^9}, {3.4454488806875*^9, 
+   3.445448888078125*^9}, {3.445448954640625*^9, 3.44544898696875*^9}, {
+   3.445449063421875*^9, 3.44544907034375*^9}, {3.445449104546875*^9, 
+   3.445449112546875*^9}, {3.445450461984375*^9, 3.4454504839375*^9}, {
+   3.445451554453125*^9, 3.445451580078125*^9}, {3.445451634921875*^9, 
+   3.4454516495625*^9}, {3.445454074203125*^9, 3.4454540806875*^9}, {
+   3.445454120015625*^9, 3.445454171734375*^9}, {3.44548182440625*^9, 
+   3.445481861265625*^9}, {3.4454822744375*^9, 3.445482330625*^9}, 
+   3.445788763284404*^9, {3.446330573625*^9, 3.4463305949375*^9}, {
+   3.44633156034375*^9, 3.44633161796875*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Experiments", "Section",
+ CellChangeTimes->{{3.44461460321875*^9, 3.44461460521875*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{"arduinoControls", "[", 
+   RowBox[{"3", ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"#", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], "+", 
+        RowBox[{
+         RowBox[{"BitAnd", "[", 
+          RowBox[{
+           RowBox[{"#", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], ",", "6"}], "]"}], "*", "128"}]}],
+        ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"BitAnd", "[", 
+          RowBox[{
+           RowBox[{"#", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], ",", "1"}], "]"}], " ", "*", " ", 
+         "50"}], "+", "200"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"#", ">", "127"}], ",", 
+            RowBox[{"#", "-", 
+             RowBox[{"2", "^", "8"}]}], ",", "#"}], "]"}], "&"}], "/@", 
+         RowBox[{"#", "[", 
+          RowBox[{"[", "3", "]"}], "]"}]}], ")"}]}], "\[IndentingNewLine]", 
+      "}"}], "&"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"{", 
+     RowBox[{"AxesOrigin", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"Automatic", ",", "0."}], "}"}]}], "}"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.4453570151941967`*^9, 3.445357017428629*^9}, 
+   3.445357878794171*^9, {3.445357936060895*^9, 3.445357956733167*^9}, {
+   3.445358041625422*^9, 3.4453580423754363`*^9}, {3.4453603895044775`*^9, 
+   3.44536039711395*^9}, {3.4453605121622972`*^9, 3.4453605136935673`*^9}, {
+   3.4453607192743235`*^9, 3.4453607212118483`*^9}, {3.445360913542435*^9, 
+   3.4453609141049423`*^9}, {3.4453612076868253`*^9, 3.4453612083118334`*^9}, 
+   3.4453618387261524`*^9, {3.4453639484902678`*^9, 3.4453639488340197`*^9}, {
+   3.445365621625976*^9, 3.4453656240478663`*^9}, {3.4453659045027866`*^9, 
+   3.445365910065322*^9}, {3.4453659957064953`*^9, 3.445365996128373*^9}, 
+   3.44538389165625*^9, {3.445384717890625*^9, 3.4453847184375*^9}, {
+   3.445388728984375*^9, 3.445388733671875*^9}, {3.445446607296875*^9, 
+   3.44544662159375*^9}, 3.4454475115*^9, {3.445447546*^9, 
+   3.445447558828125*^9}, {3.44544990284375*^9, 3.445449903125*^9}, {
+   3.445450183890625*^9, 3.44545021409375*^9}, 3.445450417453125*^9, {
+   3.4454504900625*^9, 3.4454505333125*^9}, {3.445451102625*^9, 
+   3.44545113675*^9}, {3.445451682859375*^9, 3.4454517100625*^9}, {
+   3.445451801078125*^9, 3.445451876671875*^9}, {3.445451918984375*^9, 
+   3.445451951171875*^9}, 3.445452000453125*^9, {3.44545203471875*^9, 
+   3.44545204671875*^9}, {3.445452090546875*^9, 3.445452127390625*^9}, {
+   3.445452162*^9, 3.445452164609375*^9}, {3.445452286375*^9, 
+   3.445452315140625*^9}, {3.44545236178125*^9, 3.44545237184375*^9}, {
+   3.4454524050625*^9, 3.445452426*^9}, {3.44545257240625*^9, 
+   3.445452744390625*^9}, {3.4454528905*^9, 3.44545292115625*^9}, {
+   3.445453098328125*^9, 3.445453109453125*^9}, {3.44545314996875*^9, 
+   3.44545315128125*^9}, {3.4454532540625*^9, 3.44545325440625*^9}, {
+   3.445453447796875*^9, 3.44545349046875*^9}, {3.44545367003125*^9, 
+   3.44545370228125*^9}, {3.44545459053125*^9, 3.445454596671875*^9}, {
+   3.44545536696875*^9, 3.445455372828125*^9}, {3.44545551809375*^9, 
+   3.445455521578125*^9}, {3.445455621671875*^9, 3.445455621953125*^9}, {
+   3.44545587921875*^9, 3.44545588325*^9}, {3.445456222296875*^9, 
+   3.445456251625*^9}, {3.445456307828125*^9, 3.44545631615625*^9}, 
+   3.44545635596875*^9, {3.445456515015625*^9, 3.445456517734375*^9}, {
+   3.445461974046875*^9, 3.445461975109375*^9}, {3.445462005359375*^9, 
+   3.445462030125*^9}, {3.445480992125*^9, 3.44548101421875*^9}, {
+   3.445481172*^9, 3.44548120403125*^9}, {3.445481245296875*^9, 
+   3.445481246*^9}, {3.445481931046875*^9, 3.445481936375*^9}, {
+   3.445482134875*^9, 3.44548214178125*^9}, {3.445482185921875*^9, 
+   3.445482203671875*^9}, {3.44548425134375*^9, 3.4454842551875*^9}, {
+   3.4454842875625*^9, 3.44548430209375*^9}, {3.445790326996464*^9, 
+   3.445790338575404*^9}, {3.445790449989249*^9, 3.4457904567865157`*^9}, {
+   3.445797731591693*^9, 3.445797761888956*^9}, {3.445798168534786*^9, 
+   3.4457981701285563`*^9}, {3.445822808359375*^9, 3.445822809703125*^9}, {
+   3.445823523546875*^9, 3.445823528578125*^9}, {3.4458245976875*^9, 
+   3.445824598953125*^9}, {3.4458246605625*^9, 3.445824671859375*^9}, {
+   3.446087838565031*^9, 3.446087860830941*^9}, {3.446088179631897*^9, 
+   3.4460881812256675`*^9}, {3.446088215585482*^9, 3.446088216194865*^9}, {
+   3.4460882498984213`*^9, 3.4460882712268195`*^9}, {3.446088443213396*^9, 
+   3.446088443697777*^9}, {3.4460885726056767`*^9, 3.4460885796370173`*^9}, {
+   3.4460888267339296`*^9, 3.446088855812427*^9}, {3.446089137081652*^9, 
+   3.4460891409254513`*^9}, {3.44633060728125*^9, 3.446330658296875*^9}, {
+   3.4463315040625*^9, 3.446331523328125*^9}, 3.446331924015625*^9, {
+   3.44633205275*^9, 3.446332053265625*^9}}],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     InterpretationBox[
+      RowBox[{"\<\"Save data \"\>", "\[InvisibleSpace]", 
+       CheckboxBox[Dynamic[arduino`arduinoSaveData]]}],
+      Row[{"Save data ", 
+        Checkbox[
+         Dynamic[arduino`arduinoSaveData]]}]]},
+    {
+     InterpretationBox[
+      RowBox[{
+       ButtonBox["\<\"open\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>arduino`arduinoOpen[],
+        Enabled->Dynamic[
+          Not[arduino`serialPortOpen]],
+        Evaluator->Automatic,
+        Method->"Queued"], "\[InvisibleSpace]", 
+       ButtonBox["\<\"close\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>arduino`arduinoClose[],
+        Enabled->Dynamic[arduino`serialPortOpen],
+        Evaluator->Automatic,
+        Method->"Queued"], "\[InvisibleSpace]", 
+       ButtonBox["\<\"start\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>(arduino`resetReceivedData[]; arduino`arduinoStart[]),
+        
+        Enabled->Dynamic[
+          And[
+           Not[arduino`arduinoAction], arduino`serialPortOpen]],
+        Evaluator->Automatic,
+        Method->"Queued"], "\[InvisibleSpace]", 
+       ButtonBox["\<\"stop\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>(arduino`arduinoStop[]; Pause[0.2]; 
+         arduino`readReceivedData[]; $CellContext`resultPlot$3116 = 
+          If[arduino`arduinoSaveData, 
+            
+            Module[{customListPlots`data$}, 
+             customListPlots`data$ = ({Part[#, 1] + BitAnd[
+                   Part[#, 2], 6] 128, BitAnd[
+                   Part[#, 2], 1] 50 + 200, 
+                Map[If[# > 127, # - 2^8, #]& , 
+                 Part[#, 3]]}& )[
+                Transpose[
+                 Partition[
+                  Drop[
+                   arduino`receivedData[], 32], 3]]]; If[Part[
+                 arduino`receivedData[], 
+                 Span[1, 32]] != Range[32] - 1, "Invalid header", 
+               customListPlots`scrollableListPlot[
+               customListPlots`data$, 
+                customListPlots`topPlot -> {
+                 ImageSize -> Full, AspectRatio -> 1/6, PlotRange -> All}, 
+                customListPlots`plot -> {
+                 ImageSize -> Full, AspectRatio -> 1/3, Joined -> True, 
+                  PlotRange -> All, {AxesOrigin -> {Automatic, 0.}}}]]]]),
+        Enabled->Dynamic[arduino`arduinoAction],
+        Evaluator->Automatic,
+        Method->"Queued"], "\[InvisibleSpace]", 
+       ButtonBox["\<\"reset data\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>arduino`resetReceivedData[],
+        Evaluator->Automatic,
+        Method->"Queued"]}],
+      Row[{
+        Button["open", 
+         arduino`arduinoOpen[], Method -> "Queued", Enabled -> Dynamic[
+           Not[arduino`serialPortOpen]]], 
+        Button["close", 
+         arduino`arduinoClose[], Method -> "Queued", Enabled -> 
+         Dynamic[arduino`serialPortOpen]], 
+        Button[
+        "start", arduino`resetReceivedData[]; arduino`arduinoStart[], Method -> 
+         "Queued", Enabled -> Dynamic[
+           And[
+            Not[arduino`arduinoAction], arduino`serialPortOpen]]], 
+        Button[
+        "stop", arduino`arduinoStop[]; Pause[0.2]; 
+         arduino`readReceivedData[]; $CellContext`resultPlot$3116 = 
+          If[arduino`arduinoSaveData, 
+            
+            Module[{customListPlots`data$}, 
+             customListPlots`data$ = ({Part[#, 1] + BitAnd[
+                   Part[#, 2], 6] 128, BitAnd[
+                   Part[#, 2], 1] 50 + 200, 
+                Map[If[# > 127, # - 2^8, #]& , 
+                 Part[#, 3]]}& )[
+                Transpose[
+                 Partition[
+                  Drop[
+                   arduino`receivedData[], 32], 3]]]; If[Part[
+                 arduino`receivedData[], 
+                 Span[1, 32]] != Range[32] - 1, "Invalid header", 
+               customListPlots`scrollableListPlot[
+               customListPlots`data$, 
+                customListPlots`topPlot -> {
+                 ImageSize -> Full, AspectRatio -> 1/6, PlotRange -> All}, 
+                customListPlots`plot -> {
+                 ImageSize -> Full, AspectRatio -> 1/3, Joined -> True, 
+                  PlotRange -> All, {AxesOrigin -> {Automatic, 0.}}}]]]], 
+         Method -> "Queued", Enabled -> Dynamic[arduino`arduinoAction]], 
+        Button["reset data", 
+         arduino`resetReceivedData[], Method -> "Queued"]}]]},
+    {
+     DynamicBox[ToBoxes[
+       Floor[(arduino`dataIndex - 1)/3], StandardForm],
+      ImageSizeCache->{37.125, {0., 8.}}]},
+    {
+     TagBox[GridBox[{
+        {
+         InterpretationBox[
+          RowBox[{"\<\"filterInc\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 1]], Number,
+            FieldSize->Tiny]}],
+          Row[{"filterInc", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 1]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 9]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 9]], Number, FieldSize -> Tiny]}]]},
+        {
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 2]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 2]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 10]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 10]], Number, FieldSize -> 
+             Tiny]}]]},
+        {
+         InterpretationBox[
+          RowBox[{"\<\"filterDec\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 3]], Number,
+            FieldSize->Tiny]}],
+          Row[{"filterDec", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 3]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 11]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 11]], Number, FieldSize -> 
+             Tiny]}]]},
+        {
+         InterpretationBox[
+          RowBox[{"\<\"filterDecLevel\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 4]], Number,
+            FieldSize->Tiny]}],
+          Row[{"filterDecLevel", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 4]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 12]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 12]], Number, FieldSize -> 
+             Tiny]}]]},
+        {
+         InterpretationBox[
+          RowBox[{"\<\"lowestMag\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 5]], Number,
+            FieldSize->Tiny]}],
+          Row[{"lowestMag", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 5]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 13]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 13]], Number, FieldSize -> 
+             Tiny]}]]},
+        {
+         InterpretationBox[
+          RowBox[{"\<\"powerDecay\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 6]], Number,
+            FieldSize->Tiny]}],
+          Row[{"powerDecay", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 6]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 14]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 14]], Number, FieldSize -> 
+             Tiny]}]]},
+        {
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 7]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 7]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 15]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 15]], Number, FieldSize -> 
+             Tiny]}]]},
+        {
+         InterpretationBox[
+          RowBox[{"\<\"res\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 8]], Number,
+            FieldSize->Tiny]}],
+          Row[{"res", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 8]], Number, FieldSize -> Tiny]}]], 
+         InterpretationBox[
+          RowBox[{"\<\"counter\"\>", "\[InvisibleSpace]", 
+           InputFieldBox[Dynamic[
+             Part[arduino`actionParams, 16]], Number,
+            FieldSize->Tiny]}],
+          Row[{"counter", 
+            InputField[
+             Dynamic[
+              Part[arduino`actionParams, 16]], Number, FieldSize -> Tiny]}]]}
+       },
+       ColumnsEqual->False,
+       GridBoxAlignment->{"Columns" -> {{Right}}, "Rows" -> {{Baseline}}},
+       GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+       
+       RowsEqual->False],
+      "Grid"]},
+    {
+     InterpretationBox[
+      RowBox[{
+       ButtonBox["\<\"lowestMag ++\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>(arduino`sendBytes[{1}]; Increment[
+           Part[arduino`actionParams, 5]]),
+        Evaluator->Automatic,
+        Method->"Queued"], "\[InvisibleSpace]", 
+       ButtonBox["\<\"lowestMag --\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>(arduino`sendBytes[{2}]; Decrement[
+           Part[arduino`actionParams, 5]]),
+        Evaluator->Automatic,
+        Method->"Queued"], "\[InvisibleSpace]", 
+       ButtonBox["\<\"powerDecay ++\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>(arduino`sendBytes[{3}]; Increment[
+           Part[arduino`actionParams, 6]]),
+        Evaluator->Automatic,
+        Method->"Queued"], "\[InvisibleSpace]", 
+       ButtonBox["\<\"powerDecay --\"\>",
+        Appearance->Automatic,
+        ButtonFrame->"DialogBox",
+        ButtonFunction:>(arduino`sendBytes[{4}]; Decrement[
+           Part[arduino`actionParams, 6]]),
+        Evaluator->Automatic,
+        Method->"Queued"]}],
+      Row[{
+        Button["lowestMag ++", arduino`sendBytes[{1}]; Increment[
+           Part[arduino`actionParams, 5]], Method -> "Queued"], 
+        Button["lowestMag --", arduino`sendBytes[{2}]; Decrement[
+           Part[arduino`actionParams, 5]], Method -> "Queued"], 
+        Button["powerDecay ++", arduino`sendBytes[{3}]; Increment[
+           Part[arduino`actionParams, 6]], Method -> "Queued"], 
+        Button["powerDecay --", arduino`sendBytes[{4}]; Decrement[
+           Part[arduino`actionParams, 6]], Method -> "Queued"]}]]},
+    {
+     DynamicBox[ToBoxes[$CellContext`resultPlot$3116, StandardForm],
+      ImageSizeCache->{1079., {270., 275.}}]}
+   },
+   ColumnsEqual->False,
+   GridBoxAlignment->{"Columns" -> {{Left}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+   RowsEqual->False],
+  "Column"]], "Output",
+ CellChangeTimes->{
+  3.445824672734375*^9, 3.4459918775287557`*^9, 3.4460878804561925`*^9, 
+   3.446088182053803*^9, 3.4460882178198857`*^9, {3.4460882529922113`*^9, 
+   3.44608827285184*^9}, 3.44608844430716*^9, 3.4460885854495916`*^9, {
+   3.4460888411716146`*^9, 3.4460888652344227`*^9}, 3.4460891503161964`*^9, {
+   3.44633154265625*^9, 3.4463315700625*^9}, 3.446331605109375*^9, 
+   3.4463319276875*^9, 3.4463320541875*^9}]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1208, 682},
+WindowMargins->{{0, Automatic}, {0, Automatic}},
+ShowSelection->True,
+FrontEndVersion->"6.0 for Microsoft Windows (32-bit) (February 7, 2008)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[590, 23, 100, 1, 83, "Title"],
+Cell[CellGroupData[{
+Cell[715, 28, 161, 3, 71, "Section",
+ InitializationCell->True],
+Cell[CellGroupData[{
+Cell[901, 35, 127, 2, 36, "Subsection",
+ InitializationCell->True],
+Cell[1031, 39, 387, 9, 52, "Input",
+ InitializationCell->True]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1455, 53, 124, 2, 36, "Subsection",
+ InitializationCell->True],
+Cell[1582, 57, 13135, 260, 1292, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14766, 323, 94, 1, 71, "Section"],
+Cell[CellGroupData[{
+Cell[14885, 328, 5000, 89, 172, "Input"],
+Cell[19888, 419, 13311, 337, 828, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

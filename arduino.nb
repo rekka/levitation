@@ -1,0 +1,405 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     12791,        396]
+NotebookOptionsPosition[     11660,        351]
+NotebookOutlinePosition[     12036,        367]
+CellTagsIndexPosition[     11993,        364]
+WindowFrame->Normal
+ContainsDynamic->False*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Arduino", "Title",
+ CellChangeTimes->{{3.444612492234375*^9, 3.44461249328125*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Package", "Section",
+ InitializationCell->True,
+ CellChangeTimes->{{3.4446125998125*^9, 3.444612609984375*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Prolog", "Subsection",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612616046875*^9, 3.444612618171875*^9}, {
+  3.444613447609375*^9, 3.44461344925*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"BeginPackage", "[", 
+   RowBox[{"\"\<arduino`\>\"", ",", 
+    RowBox[{"{", 
+     RowBox[{"\"\<NETLink`\>\"", ",", "\"\<customListPlots`\>\""}], "}"}]}], 
+   "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"InstallNET", "[", "]"}], ";"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612995421875*^9, 3.444612996890625*^9}, {
+  3.444613870234375*^9, 3.4446138769375*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Global variables", "Subsection",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612622921875*^9, 3.44461262565625*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"serialPortOpen", "=", "False"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"arduinoAction", " ", "=", " ", "False"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"arduinoSaveData", " ", "=", " ", "True"}], ";"}], 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"numberOfActionParams", " ", "=", " ", "16"}], ";"}], 
+  "\[IndentingNewLine]"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"actionParams", "=", 
+    RowBox[{"Table", "[", 
+     RowBox[{"0", ",", 
+      RowBox[{"{", "numberOfActionParams", "}"}]}], "]"}]}], ";"}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{"defaultBaudRate", " ", "=", " ", "57600"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"fastBaudRate", " ", "=", " ", "1000000"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"readBufferSize", " ", "=", " ", "16384"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"receivedBytesThreshold", " ", "=", " ", "2048"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"serialPort", " ", "=", " ", 
+    RowBox[{"NETNew", "[", 
+     RowBox[{"\"\<System.IO.Ports.SerialPort\>\"", ",", "\"\<COM8\>\""}], 
+     "]"}]}], ";"}], "\[IndentingNewLine]"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"serialPort", "@", "BaudRate"}], " ", "=", " ", "fastBaudRate"}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"serialPort", "@", "ReceivedBytesThreshold"}], " ", "=", " ", 
+    "receivedBytesThreshold"}], ";"}], "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"serialPort", "@", "ReceivedBytesThreshold"}], " ", "=", " ", 
+    "1"}], "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"serialPort", "@", "ReadBufferSize"}], " ", "=", " ", 
+    "readBufferSize"}], ";"}], "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"readBuffer", " ", "=", " ", 
+    RowBox[{"NETNew", "[", 
+     RowBox[{"\"\<System.Byte[]\>\"", ",", " ", 
+      RowBox[{"serialPort", "@", "ReadBufferSize"}]}], "]"}]}], ";"}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"dataBuffer", " ", "=", " ", 
+    RowBox[{"Table", "[", 
+     RowBox[{"0", ",", 
+      RowBox[{"{", "10000000", "}"}]}], "]"}]}], ";"}], "\n"}], "\n", 
+ RowBox[{
+  RowBox[{"dataIndex", " ", "=", " ", "1"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"bytesReceived", " ", ":=", " ", 
+    RowBox[{"dataIndex", " ", "-", " ", "1"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"serialEventHandler", " ", "=", " ", 
+   RowBox[{"AddEventHandler", "[", 
+    RowBox[{
+     RowBox[{"serialPort", "@", "DataReceived"}], ",", "mySerialEventFn"}], 
+    "]"}]}], ";"}], "\n"}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612736875*^9, 3.444612738546875*^9}, {
+   3.444612775265625*^9, 3.444612775609375*^9}, {3.444612912890625*^9, 
+   3.44461291728125*^9}, {3.44461328703125*^9, 3.44461328759375*^9}, {
+   3.4447001555*^9, 3.444700164921875*^9}, 3.445228262359375*^9, {
+   3.445448467265625*^9, 3.445448468484375*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definitions", "Subsection",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612629984375*^9, 3.44461263153125*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"readReceivedData", "[", "]"}], ":=", 
+   RowBox[{"Block", "[", "\n", "\t", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"btr", ",", "buff"}], "}"}], ",", "\n", "\n", "\t", 
+     RowBox[{
+      RowBox[{"btr", " ", "=", " ", 
+       RowBox[{"serialPort", "@", "BytesToRead"}]}], ";", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"btr", ">", " ", 
+         RowBox[{"readBufferSize", "/", "2"}]}], ",", "\n", "\t", 
+        RowBox[{
+         RowBox[{"Print", "[", 
+          RowBox[{"{", 
+           RowBox[{"\"\<bytes to read\>\"", ",", " ", "btr"}], "}"}], "]"}], 
+         ";"}]}], "\n", "\t", "]"}], ";", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"btr", " ", ">", " ", "0"}], ",", "\n", "\t", 
+        RowBox[{
+         RowBox[{"serialPort", "@", 
+          RowBox[{"Read", "[", 
+           RowBox[{"readBuffer", ",", " ", "0", ",", " ", "btr"}], "]"}]}], 
+         ";", "\n", "\t", 
+         RowBox[{"If", "[", 
+          RowBox[{"arduinoSaveData", ",", "\n", "\t", 
+           RowBox[{
+            RowBox[{"buff", "=", 
+             RowBox[{"NETObjectToExpression", "[", "readBuffer", "]"}]}], ";",
+             "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"dataBuffer", "[", 
+              RowBox[{"[", 
+               RowBox[{"dataIndex", ";;", 
+                RowBox[{
+                "dataIndex", " ", "+", " ", "btr", " ", "-", " ", "1"}]}], 
+               "]"}], "]"}], " ", "=", " ", 
+             RowBox[{"buff", "[", 
+              RowBox[{"[", 
+               RowBox[{"1", ";;", "btr"}], "]"}], "]"}]}], ";", "\n", "\t", 
+            RowBox[{"dataIndex", " ", "+=", " ", "btr"}]}]}], "]"}]}]}], "\n",
+        "\t", "]"}]}]}], "\n", "]"}]}], "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mySerialEventFn", "[", 
+    RowBox[{"sender_", ",", "evt_"}], "]"}], ":=", 
+   RowBox[{"readReceivedData", "[", "]"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"sendCommand", "[", 
+    RowBox[{"command_", ",", "p1_", ",", "p2_"}], "]"}], ":=", 
+   RowBox[{"Block", "[", "\n", "\t", 
+    RowBox[{
+     RowBox[{"{", "bytes", "}"}], ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{"bytes", "=", 
+       RowBox[{"MakeNETObject", "[", 
+        RowBox[{
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"ToCharacterCode", "[", "command", "]"}], ",", "p1", ",", 
+            "p2"}], "}"}], "]"}], ",", "\"\<System.Byte[]\>\""}], "]"}]}], 
+      ";", "\n", "\t", 
+      RowBox[{"serialPort", "@", 
+       RowBox[{"Write", "[", 
+        RowBox[{"bytes", ",", "0", ",", "3"}], "]"}]}], ";", "\n", "\t", 
+      RowBox[{"ReleaseNETObject", "[", "bytes", "]"}]}]}], "\n", "]"}]}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"sendBytes", "[", "data_", "]"}], ":=", 
+   RowBox[{"Block", "[", "\n", "\t", 
+    RowBox[{
+     RowBox[{"{", "bytes", "}"}], ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{"bytes", "=", 
+       RowBox[{"MakeNETObject", "[", 
+        RowBox[{"data", ",", "\"\<System.Byte[]\>\""}], "]"}]}], ";", "\n", 
+      "\t", 
+      RowBox[{"serialPort", "@", 
+       RowBox[{"Write", "[", 
+        RowBox[{"bytes", ",", "0", ",", 
+         RowBox[{"Length", "[", "data", "]"}]}], "]"}]}], ";", "\n", "\t", 
+      RowBox[{"ReleaseNETObject", "[", "bytes", "]"}]}]}], "\n", "]"}]}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"cleanup", "[", "]"}], ":=", 
+   RowBox[{"ReleaseNETObject", "/@", 
+    RowBox[{"{", 
+     RowBox[{"serialPort", ",", "readBuffer", ",", "serialEventHandler"}], 
+     "}"}]}]}], "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"arduinoOpen", "[", "]"}], ":=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"serialPort", "@", 
+      RowBox[{"Open", "[", "]"}]}], ";", 
+     RowBox[{"serialPortOpen", " ", "=", "True"}]}], ")"}]}], 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"arduinoClose", "[", "]"}], ":=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"serialPort", "@", 
+      RowBox[{"Close", "[", "]"}]}], ";", 
+     RowBox[{"serialPortOpen", " ", "=", " ", "False"}]}], ")"}]}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"resetReceivedData", "[", "]"}], ":=", 
+   RowBox[{"(", 
+    RowBox[{"dataIndex", " ", "=", " ", "1"}], ")"}]}], "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"receivedData", "[", "]"}], ":=", 
+   RowBox[{"(", 
+    RowBox[{"dataBuffer", "[", 
+     RowBox[{"[", 
+      RowBox[{"1", ";;", 
+       RowBox[{"dataIndex", "-", "1"}]}], "]"}], "]"}], ")"}]}], "\n"}], "\n",
+ 
+ RowBox[{
+  RowBox[{
+   RowBox[{"arduinoStart", "[", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "com", "}"}], ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{"com", " ", "=", " ", 
+       RowBox[{"Flatten", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"Mod", "[", 
+             RowBox[{"#", ",", "256"}], "]"}], ",", 
+            RowBox[{"Floor", "[", 
+             RowBox[{"#", "/", "256"}], "]"}]}], "}"}], "&"}], "/@", 
+         "actionParams"}], "]"}]}], ";", "\n", "\t", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"sendBytes", "[", 
+          RowBox[{"{", "#", "}"}], "]"}], ")"}], "&"}], "/@", "com"}], ";", 
+      "\n", "\t", 
+      RowBox[{"arduinoAction", "=", "True"}]}]}], "\[IndentingNewLine]", 
+    "]"}]}], "\[IndentingNewLine]"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"arduinoStart", "[", "bytes_", "]"}], ":=", 
+   RowBox[{"(", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"sendBytes", "[", "bytes", "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"arduinoAction", " ", "=", " ", "True"}]}], 
+    "\[IndentingNewLine]", ")"}]}], "\[IndentingNewLine]"}], "\n", 
+ RowBox[{
+  RowBox[{"arduinoStop", "[", "]"}], ":=", 
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"sendBytes", "[", 
+     RowBox[{"{", "0", "}"}], "]"}], ";", 
+    RowBox[{"arduinoAction", "=", "False"}]}], ")"}]}], "\n"}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612683171875*^9, 3.44461274378125*^9}, {
+   3.444612774109375*^9, 3.444612807984375*^9}, 3.4446128499375*^9, {
+   3.444613027453125*^9, 3.444613093625*^9}, {3.444613279984375*^9, 
+   3.444613281546875*^9}, {3.4446138641875*^9, 3.444613864625*^9}, {
+   3.44461450790625*^9, 3.444614509984375*^9}, {3.444700213359375*^9, 
+   3.444700244984375*^9}, {3.445228180703125*^9, 3.44522822490625*^9}, {
+   3.445228272328125*^9, 3.445228274578125*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Epilog", "Subsection",
+ InitializationCell->True,
+ CellChangeTimes->{{3.444612643265625*^9, 3.444612648921875*^9}, {
+  3.444613455140625*^9, 3.444613455953125*^9}}],
+
+Cell[BoxData[
+ RowBox[{"EndPackage", "[", "]"}]], "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+
+Cell["Experiments", "Section",
+ CellChangeTimes->{{3.444612519578125*^9, 3.44461252115625*^9}}]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{756, 685},
+WindowMargins->{{1, Automatic}, {Automatic, -1}},
+FrontEndVersion->"6.0 for Microsoft Windows (32-bit) (February 7, 2008)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[590, 23, 89, 1, 83, "Title"],
+Cell[CellGroupData[{
+Cell[704, 28, 117, 2, 71, "Section",
+ InitializationCell->True],
+Cell[CellGroupData[{
+Cell[846, 34, 166, 3, 36, "Subsection",
+ InitializationCell->True],
+Cell[1015, 39, 417, 11, 52, "Input",
+ InitializationCell->True]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1469, 55, 130, 2, 36, "Subsection",
+ InitializationCell->True],
+Cell[1602, 59, 2957, 85, 592, "Input",
+ InitializationCell->True]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4596, 149, 125, 2, 36, "Subsection",
+ InitializationCell->True],
+Cell[4724, 153, 6503, 178, 1132, "Input",
+ InitializationCell->True]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11264, 336, 170, 3, 36, "Subsection",
+ InitializationCell->True],
+Cell[11437, 341, 85, 2, 31, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[11549, 347, 95, 1, 71, "Section"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
